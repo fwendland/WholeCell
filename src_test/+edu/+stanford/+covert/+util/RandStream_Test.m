@@ -209,14 +209,26 @@ classdef RandStream_Test < TestCase
         
         function testReproducibility(this)
             %% hold state of default stream
-            defaultStream = RandStream.getDefaultStream();
+            if verLessThan('matlab', '7.13.0')
+                defaultStream = RandStream.getDefaultStream();
+            else
+                defaultStream = RandStream.getGlobalStream();
+            end
+            
+%             defaultStream = RandStream.getDefaultStream();
             defaultStreamType = defaultStream.Type;
             defaultStreamSeed = defaultStream.Seed;
             defaultStreamNumStreams = defaultStream.NumStreams;
             defaultStreamStreamIndex = defaultStream.StreamIndex;
             defaultStreamState = defaultStream.State;
             defaultStreamSubstram = defaultStream.Substream;
-            defaultStreamRandnAlg = defaultStream.RandnAlg;
+            
+            if verLessThan('matlab', '8')
+                defaultStreamRandnAlg = defaultStream.RandnAlg;
+            else
+                defaultStreamRandnAlg = defaultStream.NormalTransform;
+            end
+            
             defaultStreamAntithetic = defaultStream.Antithetic;
             defaultStreamFullPrecision = defaultStream.FullPrecision;
             
@@ -231,14 +243,26 @@ classdef RandStream_Test < TestCase
             assertEqual(val1, val2);
             
             %% assert state of default stream unchanged
-            defaultStream = RandStream.getDefaultStream();
+            %% hold state of default stream
+            if verLessThan('matlab', '7.13.0')
+                defaultStream = RandStream.getDefaultStream();
+            else
+                defaultStream = RandStream.getGlobalStream();
+            end
+            
             assertEqual(defaultStreamType, defaultStream.Type);
             assertEqual(defaultStreamSeed, defaultStream.Seed);
             assertEqual(defaultStreamNumStreams, defaultStream.NumStreams);
             assertEqual(defaultStreamStreamIndex, defaultStream.StreamIndex);
             assertEqual(defaultStreamState, defaultStream.State);
             assertEqual(defaultStreamSubstram, defaultStream.Substream);
-            assertEqual(defaultStreamRandnAlg, defaultStream.RandnAlg);
+                        
+            if verLessThan('matlab', '8')
+                assertEqual(defaultStreamRandnAlg, defaultStream.RandnAlg);
+            else
+                assertEqual(defaultStreamRandnAlg, defaultStream.NormalTransform);
+            end
+            
             assertEqual(defaultStreamAntithetic, defaultStream.Antithetic);
             assertEqual(defaultStreamFullPrecision, defaultStream.FullPrecision);
         end
